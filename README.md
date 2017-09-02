@@ -1,2 +1,1 @@
-# fcc-timestamp-microservice
-Timestamp Microservice
+FCC Timestamp Microservice
