@@ -13,7 +13,6 @@ app.get("/", function (request, response) {
 });
 
 app.get("/:input", function (req, res) {
-  var test
   var obj
   var input=req.params.input
   var unixTime=null
