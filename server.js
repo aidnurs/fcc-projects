@@ -1,6 +1,8 @@
 
 var express = require('express');
 var app = express();
+var url = require('url')
+var dateFormat = require('dateformat');
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -11,12 +13,26 @@ app.get("/", function (request, response) {
 });
 
 app.get("/:input", function (req, res) {
+  var obj
   var input=req.params.input
-  console.log(req)
-  console.log(req.params)
-  console.log(req.params.input)
-  var obj=JSON.parse(input);
-  res.send(JSON.stringify(obj));
+  var unixTime=null
+  var naturalTime=null
+  //unix
+  if(Number.isInteger(Number(input))){
+    unixTime=Number(input)
+    naturalTime=dateFormat(new Date(input*1000),"mmmm dd, yyyy")
+  }
+  //time
+  else{ 
+    naturalTime=input
+    unixTime=new Date(naturalTime).getTime() / 1000
+  }
+  obj={
+    unix:unixTime,
+    natural:naturalTime
+  }
+  res.json(obj)
+  res.end()
 });
 
 // listen for requests :)
