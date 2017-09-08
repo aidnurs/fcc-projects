@@ -1,6 +1,10 @@
+
 var express = require('express');
 var app = express();
-var offset=1;
+
+const GoogleImages = require('google-images');
+ 
+const client = new GoogleImages(process.env.CSE_ID, process.env.CSE_API_KEY);
 
 app.use(express.static('public'));
 
@@ -8,19 +12,12 @@ app.get("/", function (request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/api/imagesearch/:query", function (req, res) {
-  var url = "https://www.googleapis.com/customsearch/v1?q=" + req.params.query 
-    + "&cx=" + process.env.Engine_ID
-    + "&num=10&start=" + Number(1 + parseInt(offset)*10)
-    + "&fileType=bmp,png,gif,jpg,jpeg"
-    + "&key=" + process.env.Google_API_key;
-  res.send(url);
+app.get('/cats',function(req,res){
+  var obj={};
+  client.search('cats').then(images => {
+    res.json(images);
+  });
 });
-
-app.get("/api/latest/imagesearch/", function (request, response) {
-  
-});
-
 
 var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);

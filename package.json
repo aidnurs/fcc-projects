@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "express": "^4.15.4",
-    "mongodb": "^2.2.31"
+    "mongodb": "^2.2.31",
+    "request": "^2.81.0",
+    "google-images": "^2.1.0"
   },
   "engines": {
     "node": "8.x"
