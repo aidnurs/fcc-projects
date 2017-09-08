@@ -1,39 +1,46 @@
-// server.js
-// where your node app starts
 
-// init project
 var express = require('express');
 var app = express();
+var mongo= require('mongodb').MongoClient;
+var mongoUri="mongodb://"+process.env.user+":"+process.env.password+"@ds131384.mlab.com:31384/imgsearch"
 
-// we've started you off with Express, 
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
+const GoogleImages = require('google-images');
+ 
+const client = new GoogleImages(process.env.CSE_ID, process.env.CSE_API_KEY);
 
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/dreams", function (request, response) {
-  response.send(dreams);
+app.get('/api/imagesearch/:input',function(req,res){
+  var input=req.params.input;
+  mongo.connect(mongoUri,function(err,db){
+    db.collection('imgsearch').insert({
+      term:input,
+      when:new Date()
+    });
+    db.close();
+  });
+  
+  var obj={};
+  client.search('cats').then(images => {
+    res.json(images);
+  });
 });
 
-// could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", function (request, response) {
-  dreams.push(request.query.dream);
-  response.sendStatus(200);
+app.get('/api/latest/imagesearch/',function(req,res){
+  mongo.connect(mongoUri,function(err,db){
+    db.collection('imgsearch').find({},{_id: 0, term: 1, when: 1}).toArray()
+      .then(results => {
+        db.close();
+        res.json(results);
+      })
+    db.close();
+  });
 });
 
-// Simple in-memory store for now
-var dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-];
-
-// listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
