@@ -1,59 +1,42 @@
-<<<<<<< HEAD
+// server.js
+// where your node app starts
 
+// init project
 var express = require('express');
 var app = express();
-var url = require('url')
-var dateFormat = require('dateformat');
+
+// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
+// so that your API is remotely testable by FCC 
+var cors = require('cors');
+app.use(cors({optionSuccessStatus: 200}));  // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
 // http://expressjs.com/en/starter/basic-routing.html
-app.get("/", function (request, response) {
-  response.sendFile(__dirname + '/views/index.html');
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/:input", function (req, res) {
-  var obj
-  var input=req.params.input
-  var unixTime=null
-  var naturalTime=null
-  //unix
-  if(Number.isInteger(Number(input))){
-    unixTime=Number(input)
-    naturalTime=dateFormat(new Date(input*1000),"mmmm dd, yyyy")
-  }
-  //time
-  else{ 
-    naturalTime=input
-    unixTime=new Date(naturalTime).getTime() / 1000
-  }
-  obj={
-    unix:unixTime,
-    natural:naturalTime
+
+// your first API endpoint... 
+app.get("/api/hello", function (req, res) {
+  res.json({greeting: 'hello API'});
+});
+
+app.get("/api/whoami",(req,res)=>{
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  
+  console.log(req.headers)
+  const obj={
+    "ipaddress":req.headers['x-forwarded-for'].split(',')[0],
+        "language":req.headers['accept-language'],
+    "software":req.headers['user-agent']
   }
   res.json(obj)
-  res.end()
 });
 
 // listen for requests :)
-=======
-var express = require('express');
-var app = express();
-
-app.use(express.static('public'));
-
-app.get("/",function(req,res){
-  
-  var obj={
-    ipaddress:req.headers["x-forwarded-for"].split(',')[0],
-    language:req.headers["accept-language"].split(',')[0],
-    software:req.headers["user-agent"].split(/[\(\)]/)[1],
-  }
-  res.json(obj)
-});
-
->>>>>>> project-a/master
 var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
